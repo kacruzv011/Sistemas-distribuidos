@@ -1,21 +1,35 @@
 #include <iostream>
-#include <chrono>
 #include <fstream>
+#include <cstdlib>  // Para system()
 #include "Particula.h"
 
-void simular(const std::string& nombreArchivo, const Vector2D& campo, const Particula& inicial, int pasos, double dt) {
-    std::ofstream archivo(nombreArchivo);
-    archivo << "Paso,Posicion_X,Posicion_Y,Velocidad_X,Velocidad_Y\n";
+void simular(const std::string& nombreCSV, const std::string& tituloGrafica, const Vector2D& campo, const Particula& inicial, int pasos, double dt) {
+    std::ofstream archivo(nombreCSV);
+    archivo << "Paso,Posicion_X,Posicion_Y\n";
 
     Particula p = inicial;
     for (int i = 0; i < pasos; ++i) {
-        archivo << i << "," << p.posicion.x << "," << p.posicion.y << ","
-                << p.velocidad.x << "," << p.velocidad.y << "\n";
+        archivo << i << "," << p.posicion.x << "," << p.posicion.y << "\n";
         p.actualizar(campo, dt);
     }
-
     archivo.close();
-    std::cout << "Simulación guardada en " << nombreArchivo << "\n";
+    std::cout << "Datos guardados en " << nombreCSV << "\n";
+
+    // Crear script de Gnuplot
+    std::string nombreGP = nombreCSV.substr(0, nombreCSV.find('.')) + ".gp";
+    std::ofstream gp(nombreGP);
+    gp << "set title \"" << tituloGrafica << "\"\n";
+    gp << "set xlabel \"Paso\"\n";
+    gp << "set ylabel \"Posición\"\n";
+    gp << "set grid\n";
+    gp << "plot \"" << nombreCSV << "\" using 1:2 with lines title 'Posición X', \\\n";
+    gp << "     \"" << nombreCSV << "\" using 1:3 with lines title 'Posición Y'\n";
+    gp << "pause -1\n";  // Espera a que el usuario cierre
+    gp.close();
+
+    // Ejecutar gnuplot
+    std::string comando = "gnuplot " + nombreGP;
+    system(comando.c_str());
 }
 
 int main() {
@@ -25,12 +39,12 @@ int main() {
     // Simulación 1
     Vector2D campo1(6.0, -1.0);
     Particula particula1(Vector2D(0, 0), Vector2D(0, 0), 5.0, 21.0);
-    simular("simulacion_1.csv", campo1, particula1, pasos, dt);
+    simular("simulacion_1.csv", "Simulación 1: Campo (6, -1), Carga 21", campo1, particula1, pasos, dt);
 
     // Simulación 2
     Vector2D campo2(27.0, 2.0);
     Particula particula2(Vector2D(3, 9), Vector2D(9, 3), 2.0, -1.0);
-    simular("simulacion_2.csv", campo2, particula2, pasos, dt);
+    simular("simulacion_2.csv", "Simulación 2: Campo (27, 2), Carga -1", campo2, particula2, pasos, dt);
 
     return 0;
 }
