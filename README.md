@@ -1,1 +1,2 @@
 # Sistemas-distribuidos
+modelamos y simulamos el movimiento de partículas cargadas bajo la influencia de un campo eléctrico utilizando las leyes de la física clásica. Se aplica la sobrecarga de operadores para representar la interacción entre las partículas, construir un Makefile para automatizar la compilación y realizar pruebas de eficiencia en las simulaciones con configuraciones Debug y Release.
