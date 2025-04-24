@@ -18,18 +18,34 @@ void simular(const std::string& nombreCSV, const std::string& tituloGrafica, con
     // Crear script de Gnuplot
     std::string nombreGP = nombreCSV.substr(0, nombreCSV.find('.')) + ".gp";
     std::ofstream gp(nombreGP);
+    
+    // Verificar si el archivo se abrió correctamente
+    if (!gp.is_open()) {
+        std::cerr << "Error al crear el archivo de Gnuplot: " << nombreGP << std::endl;
+        return;
+    }
+    
     gp << "set title \"" << tituloGrafica << "\"\n";
     gp << "set xlabel \"Paso\"\n";
     gp << "set ylabel \"Posición\"\n";
     gp << "set grid\n";
-    gp << "plot \"" << nombreCSV << "\" using 1:2 with lines title 'Posición X', \\\n";
-    gp << "     \"" << nombreCSV << "\" using 1:3 with lines title 'Posición Y'\n";
+    
+    // Configuración del separador de columnas (si es CSV con comas)
+    gp << "set datafile separator \",\"\n";
+    
+    // Graficar ambos archivos: simulacion_1.csv y simulacion_2.csv
+    gp << "plot \"" << nombreCSV << "\" using 1:2 skip 1 with lines title 'Posición X 1', \\\n";
+    gp << "     \"" << nombreCSV << "\" using 1:3 skip 1 with lines title 'Posición Y 1', \\\n";
+    gp << "     \"simulacion_2.csv\" using 1:2 skip 1 with lines title 'Posición X 2', \\\n";
+    gp << "     \"simulacion_2.csv\" using 1:3 skip 1 with lines title 'Posición Y 2'\n";
+    
     gp << "pause -1\n";  // Espera a que el usuario cierre
     gp.close();
-
+    
     // Ejecutar gnuplot
     std::string comando = "gnuplot " + nombreGP;
     system(comando.c_str());
+    
 }
 
 int main() {
