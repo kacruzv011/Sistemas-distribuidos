@@ -1,51 +1,20 @@
 #include <iostream>
 #include <fstream>
-#include <cstdlib>  // Para system()
+#include <cstdlib>
 #include "Particula.h"
 
-void simular(const std::string& nombreCSV, const std::string& tituloGrafica, const Vector2D& campo, const Particula& inicial, int pasos, double dt) {
+void simular(const std::string& nombreCSV, const Vector2D& campo, const Particula& inicial, int pasos, double dt) {
     std::ofstream archivo(nombreCSV);
-    archivo << "Paso,Posicion_X,Posicion_Y\n";
+    archivo << "Paso,Posicion_X,Posicion_Y,Velocidad_X,Velocidad_Y\n";
 
     Particula p = inicial;
     for (int i = 0; i < pasos; ++i) {
-        archivo << i << "," << p.posicion.x << "," << p.posicion.y << "\n";
+        archivo << i << "," << p.posicion.x << "," << p.posicion.y << ","
+                << p.velocidad.x << "," << p.velocidad.y << "\n";
         p.actualizar(campo, dt);
     }
     archivo.close();
     std::cout << "Datos guardados en " << nombreCSV << "\n";
-
-    // Crear script de Gnuplot
-    std::string nombreGP = nombreCSV.substr(0, nombreCSV.find('.')) + ".gp";
-    std::ofstream gp(nombreGP);
-    
-    // Verificar si el archivo se abrió correctamente
-    if (!gp.is_open()) {
-        std::cerr << "Error al crear el archivo de Gnuplot: " << nombreGP << std::endl;
-        return;
-    }
-    
-    gp << "set title \"" << tituloGrafica << "\"\n";
-    gp << "set xlabel \"Paso\"\n";
-    gp << "set ylabel \"Posición\"\n";
-    gp << "set grid\n";
-    
-    // Configuración del separador de columnas (si es CSV con comas)
-    gp << "set datafile separator \",\"\n";
-    
-    // Graficar ambos archivos: simulacion_1.csv y simulacion_2.csv
-    gp << "plot \"" << nombreCSV << "\" using 1:2 skip 1 with lines title 'Posición X 1', \\\n";
-    gp << "     \"" << nombreCSV << "\" using 1:3 skip 1 with lines title 'Posición Y 1', \\\n";
-    gp << "     \"simulacion_2.csv\" using 1:2 skip 1 with lines title 'Posición X 2', \\\n";
-    gp << "     \"simulacion_2.csv\" using 1:3 skip 1 with lines title 'Posición Y 2'\n";
-    
-    gp << "pause -1\n";  // Espera a que el usuario cierre
-    gp.close();
-    
-    // Ejecutar gnuplot
-    std::string comando = "gnuplot " + nombreGP;
-    system(comando.c_str());
-    
 }
 
 int main() {
@@ -55,14 +24,46 @@ int main() {
     // Simulación 1
     Vector2D campo1(6.0, -1.0);
     Particula particula1(Vector2D(0, 0), Vector2D(0, 0), 5.0, 21.0);
-    simular("simulacion_1.csv", "Simulación 1: Campo (6, -1), Carga 21", campo1, particula1, pasos, dt);
+    simular("simulacion_1.csv", campo1, particula1, pasos, dt);
 
     // Simulación 2
     Vector2D campo2(27.0, 2.0);
     Particula particula2(Vector2D(3, 9), Vector2D(9, 3), 2.0, -1.0);
-    simular("simulacion_2.csv", "Simulación 2: Campo (27, 2), Carga -1", campo2, particula2, pasos, dt);
+    simular("simulacion_2.csv", campo2, particula2, pasos, dt);
+
+    // Script de Gnuplot
+    std::ofstream gp("graficas_combinadas.gp");
+    if (!gp.is_open()) {
+        std::cerr << "No se pudo crear el script de Gnuplot.\n";
+        return 1;
+    }
+
+    gp << "set datafile separator ','\n";
+    gp << "set grid\n";
+    gp << "set terminal pngcairo size 1000,800 enhanced font 'Verdana,10'\n";
+
+    // Gráfica 1: Simulación 1
+    gp << "set output 'grafica_1.png'\n";
+    gp << "set title 'Simulación 1: Posición y Velocidad'\n";
+    gp << "set xlabel 'Paso'\n";
+    gp << "set ylabel 'Magnitud'\n";
+    gp << "plot 'simulacion_1.csv' using 1:2 with lines title 'Posición X', \\\n";
+    gp << "     'simulacion_1.csv' using 1:3 with lines title 'Posición Y', \\\n";
+    gp << "     'simulacion_1.csv' using 1:4 with lines title 'Velocidad X', \\\n";
+    gp << "     'simulacion_1.csv' using 1:5 with lines title 'Velocidad Y'\n";
+
+    // Gráfica 2: Simulación 2
+    gp << "set output 'grafica_2.png'\n";
+    gp << "set title 'Simulación 2: Posición y Velocidad'\n";
+    gp << "plot 'simulacion_2.csv' using 1:2 with lines title 'Posición X', \\\n";
+    gp << "     'simulacion_2.csv' using 1:3 with lines title 'Posición Y', \\\n";
+    gp << "     'simulacion_2.csv' using 1:4 with lines title 'Velocidad X', \\\n";
+    gp << "     'simulacion_2.csv' using 1:5 with lines title 'Velocidad Y'\n";
+
+    gp << "set output\n";
+    gp.close();
+
+    system("gnuplot graficas_combinadas.gp");
 
     return 0;
 }
-
-
