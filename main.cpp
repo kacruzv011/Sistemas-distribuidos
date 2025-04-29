@@ -21,14 +21,18 @@ int main() {
     double dt = 0.01;
     int pasos = 1000;
 
-    // Simulación 1
+    // Simulación 1 - Electrón
     Vector2D campo1(6.0, -1.0);
-    Particula particula1(Vector2D(0, 0), Vector2D(0, 0), 5.0, 21.0);
+    double masa_electron = 9.11e-31;           // kg
+    double carga_electron = -1.6e-19;          // C
+    Particula particula1(Vector2D(0, 0), Vector2D(0, 0), masa_electron, carga_electron);
     simular("simulacion_1.csv", campo1, particula1, pasos, dt);
 
-    // Simulación 2
+    // Simulación 2 - Ion Ca2+
     Vector2D campo2(27.0, 2.0);
-    Particula particula2(Vector2D(3, 9), Vector2D(9, 3), 2.0, -1.0);
+    double masa_calcio = 6.64e-26;             // kg (aprox. 40 u)
+    double carga_calcio = 3.2e-19;             // C (2 * carga elemental)
+    Particula particula2(Vector2D(3, 9), Vector2D(9, 3), masa_calcio, carga_calcio);
     simular("simulacion_2.csv", campo2, particula2, pasos, dt);
 
     // Script de Gnuplot
@@ -44,7 +48,7 @@ int main() {
 
     // Gráfica 1: Simulación 1
     gp << "set output 'grafica_1.png'\n";
-    gp << "set title 'Simulación 1: Posición y Velocidad'\n";
+    gp << "set title 'Simulación 1 (Electrón): Posición y Velocidad'\n";
     gp << "set xlabel 'Paso'\n";
     gp << "set ylabel 'Magnitud'\n";
     gp << "plot 'simulacion_1.csv' using 1:2 with lines title 'Posición X', \\\n";
@@ -54,7 +58,7 @@ int main() {
 
     // Gráfica 2: Simulación 2
     gp << "set output 'grafica_2.png'\n";
-    gp << "set title 'Simulación 2: Posición y Velocidad'\n";
+    gp << "set title 'Simulación 2 (Ion Ca²⁺): Posición y Velocidad'\n";
     gp << "plot 'simulacion_2.csv' using 1:2 with lines title 'Posición X', \\\n";
     gp << "     'simulacion_2.csv' using 1:3 with lines title 'Posición Y', \\\n";
     gp << "     'simulacion_2.csv' using 1:4 with lines title 'Velocidad X', \\\n";
