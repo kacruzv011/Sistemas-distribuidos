@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cmath>
 #include "Particula.h"
 
 void simular(const std::string& nombreCSV, const Vector2D& campo, const Particula& inicial, int pasos, double dt) {
@@ -21,18 +22,14 @@ int main() {
     double dt = 0.01;
     int pasos = 1000;
 
-    // Simulación 1 - Electrón
+    // Simulación 1
     Vector2D campo1(6.0, -1.0);
-    double masa_electron = 9.11e-31;           // kg
-    double carga_electron = -1.6e-19;          // C
-    Particula particula1(Vector2D(0, 0), Vector2D(0, 0), masa_electron, carga_electron);
+    Particula particula1(Vector2D(0, 0), Vector2D(0, 0), 1.6e-27, 1.6e-19);
     simular("simulacion_1.csv", campo1, particula1, pasos, dt);
 
-    // Simulación 2 - Ion Ca2+
+    // Simulación 2
     Vector2D campo2(27.0, 2.0);
-    double masa_calcio = 6.64e-26;             // kg (aprox. 40 u)
-    double carga_calcio = 3.2e-19;             // C (2 * carga elemental)
-    Particula particula2(Vector2D(3, 9), Vector2D(9, 3), masa_calcio, carga_calcio);
+    Particula particula2(Vector2D(3, 9), Vector2D(9, 3),9.11e-31 , -1.6e-19);
     simular("simulacion_2.csv", campo2, particula2, pasos, dt);
 
     // Script de Gnuplot
@@ -48,7 +45,7 @@ int main() {
 
     // Gráfica 1: Simulación 1
     gp << "set output 'grafica_1.png'\n";
-    gp << "set title 'Simulación 1 (Electrón): Posición y Velocidad'\n";
+    gp << "set title 'Simulación 1: Posición y Velocidad'\n";
     gp << "set xlabel 'Paso'\n";
     gp << "set ylabel 'Magnitud'\n";
     gp << "plot 'simulacion_1.csv' using 1:2 with lines title 'Posición X', \\\n";
@@ -58,27 +55,28 @@ int main() {
 
     // Gráfica 2: Simulación 2
     gp << "set output 'grafica_2.png'\n";
-    gp << "set title 'Simulación 2 (Ion Ca²⁺): Posición y Velocidad'\n";
+    gp << "set title 'Simulación 2: Posición y Velocidad'\n";
     gp << "plot 'simulacion_2.csv' using 1:2 with lines title 'Posición X', \\\n";
     gp << "     'simulacion_2.csv' using 1:3 with lines title 'Posición Y', \\\n";
     gp << "     'simulacion_2.csv' using 1:4 with lines title 'Velocidad X', \\\n";
     gp << "     'simulacion_2.csv' using 1:5 with lines title 'Velocidad Y'\n";
 
+
         // Gráfica 3: Tiempo vs Pasos (Debug y Release)
-    gp << "set output 'grafica_tiempos.png'\n";
-    gp << "set title 'Tiempo de ejecución vs Pasos'\n";
-    gp << "set xlabel 'Número de pasos'\n";
-    gp << "set ylabel 'Tiempo (s)'\n";
-    gp << "plot 'tiempos.csv' using 1:2 with linespoints title 'Debug', \\\n";
-    gp << "     'tiempos.csv' using 1:3 with linespoints title 'Release'\n";
-
-    gp << "set output\n";
-    gp.close();
-
-    gp << "set output\n";
-    gp.close();
-
-    system("gnuplot graficas_combinadas.gp");
-
-    return 0;
+        gp << "set output 'grafica_tiempos.png'\n";
+        gp << "set title 'Tiempo de ejecución vs Pasos'\n";
+        gp << "set xlabel 'Número de pasos'\n";
+        gp << "set ylabel 'Tiempo (s)'\n";
+        gp << "plot 'tiempos.csv' using 1:2 with linespoints title 'Debug', \\\n";
+        gp << "     'tiempos.csv' using 1:3 with linespoints title 'Release'\n";
+    
+        gp << "set output\n";
+        gp.close();
+    
+        gp << "set output\n";
+        gp.close();
+    
+        system("gnuplot graficas_combinadas.gp");
+    
+        return 0;
 }
