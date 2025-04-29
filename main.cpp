@@ -64,6 +64,17 @@ int main() {
     gp << "     'simulacion_2.csv' using 1:4 with lines title 'Velocidad X', \\\n";
     gp << "     'simulacion_2.csv' using 1:5 with lines title 'Velocidad Y'\n";
 
+        // Gráfica 3: Tiempo vs Pasos (Debug y Release)
+    gp << "set output 'grafica_tiempos.png'\n";
+    gp << "set title 'Tiempo de ejecución vs Pasos'\n";
+    gp << "set xlabel 'Número de pasos'\n";
+    gp << "set ylabel 'Tiempo (s)'\n";
+    gp << "plot 'tiempos.csv' using 1:2 with linespoints title 'Debug', \\\n";
+    gp << "     'tiempos.csv' using 1:3 with linespoints title 'Release'\n";
+
+    gp << "set output\n";
+    gp.close();
+
     gp << "set output\n";
     gp.close();
 
