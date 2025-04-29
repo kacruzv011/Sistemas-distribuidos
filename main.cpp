@@ -28,7 +28,7 @@ int main() {
         std::cerr << "No se pudo crear tiempos.csv\n";
         return 1;
     }
-    tiempos << "Pasos,Debug,Release\n"; // puedes usar la misma columna para ambas si mides solo una vez
+    tiempos << "Pasos,Debug,Release\n"; 
 
     Vector2D campo_tiempo(6.0, -1.0);
     double masa = 9.11e-31;
